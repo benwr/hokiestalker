@@ -34,38 +34,38 @@ end
 def search(filter)
   ldap = Net::LDAP.new :host => LDAP_URI
   treebase = "dc=vt, dc=edu"
-  if (result = ldap.search(:base => treebase, :filter => filter)).length > 0
-    result.each do |person|
-      printables = { # attributes for printing, and their associated labels
-                    :cn =>                  'Name',
-                    :uid =>                 'UID',
-                    :uupid =>               'PID',
-                    :mail =>                'Email',
-                    :major =>               'Major',
-                    :department =>          'Department',
-                    :title =>               'Title',
-                    :postaladdress =>       'VT Address',
-                    :mailstop =>            'Mail Stop',
-                    :telephonenumber =>     'VT Phone',
-                    :localpostaladdress =>  'Home Address',
-                    :localphone =>          'Personal Phone'
-      }
+  if (result = ldap.search(:base => treebase, :filter => filter)).length <= 0
+    return false
+  end
 
-      person.each do |attribute, value|# value: an array containing attribute for person.
-        if printables.include? attribute
-          if printables[attribute].include? "Address" # Extra step for addresses
-            pretty_print printables[attribute], parse_addr(value)
-          elsif not (attribute == :department and person[:major].length > 0)
-            # we don't want to show information that is certainly redundant.
-            pretty_print printables[attribute], value
-          end
+  result.each do |person|
+    printables = { # attributes for printing, and their associated labels
+      :cn =>                  'Name',
+      :uid =>                 'UID',
+      :uupid =>               'PID',
+      :mail =>                'Email',
+      :major =>               'Major',
+      :department =>          'Department',
+      :title =>               'Title',
+      :postaladdress =>       'VT Address',
+      :mailstop =>            'Mail Stop',
+      :telephonenumber =>     'VT Phone',
+      :localpostaladdress =>  'Home Address',
+      :localphone =>          'Personal Phone'
+    }
+
+    person.each do |attribute, value|# value: an array containing attribute for person.
+      if printables.include? attribute
+        if printables[attribute].include? "Address" # Extra step for addresses
+          pretty_print printables[attribute], parse_addr(value)
+        elsif not (attribute == :department and person[:major].length > 0)
+          # we don't want to show information that is certainly redundant.
+          pretty_print printables[attribute], value
         end
       end
-      puts "\n"
     end
-    return true # We found at least one person that fits the criteria
-  else
-    return false # We didn't find anyone
+    puts "\n"
+    return true
   end
 end
 
