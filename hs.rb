@@ -27,10 +27,6 @@ def pretty_print(label, data)
   end
 end
 
-def parse_addr(addr)
-  return addr[0].split('$')
-end
-
 def search(filter)
   ldap = Net::LDAP.new :host => LDAP_URI
   treebase = "dc=vt, dc=edu"
@@ -56,8 +52,10 @@ def search(filter)
   result.each do |person|
     person.each do |attribute, value| # value: array containing attr values.
       if printables.include? attribute              # We want to print this attr
+
         if printables[attribute].include? "Address" # Extra step for addresses
-          pretty_print printables[attribute], parse_addr(value)
+          pretty_print printables[attribute], value[0].split('$')
+
         elsif not (attribute == :department and person[:major].length > 0)
           # we don't want to show department if major is available too
           pretty_print printables[attribute], value
