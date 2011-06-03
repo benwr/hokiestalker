@@ -34,37 +34,37 @@ end
 def search(filter)
   ldap = Net::LDAP.new :host => LDAP_URI
   treebase = "dc=vt, dc=edu"
-  if (result = ldap.search(:base => treebase, :filter => filter)).length <= 0
-    return false
-  end
+  result = ldap.search(:base => treebase, :filter => filter)
+
+  return false if result.length <= 0
+
+  printables = { # attributes for printing, and their associated labels
+    :cn =>                  'Name',
+    :uid =>                 'UID',
+    :uupid =>               'PID',
+    :mail =>                'Email',
+    :major =>               'Major',
+    :department =>          'Department',
+    :title =>               'Title',
+    :postaladdress =>       'VT Address',
+    :mailstop =>            'Mail Stop',
+    :telephonenumber =>     'VT Phone',
+    :localpostaladdress =>  'Home Address',
+    :localphone =>          'Personal Phone'
+  }
 
   result.each do |person|
-    printables = { # attributes for printing, and their associated labels
-      :cn =>                  'Name',
-      :uid =>                 'UID',
-      :uupid =>               'PID',
-      :mail =>                'Email',
-      :major =>               'Major',
-      :department =>          'Department',
-      :title =>               'Title',
-      :postaladdress =>       'VT Address',
-      :mailstop =>            'Mail Stop',
-      :telephonenumber =>     'VT Phone',
-      :localpostaladdress =>  'Home Address',
-      :localphone =>          'Personal Phone'
-    }
-
-    person.each do |attribute, value|# value: an array containing attribute for person.
-      if printables.include? attribute
+    person.each do |attribute, value| # value: array containing attr values.
+      if printables.include? attribute              # We want to print this attr
         if printables[attribute].include? "Address" # Extra step for addresses
           pretty_print printables[attribute], parse_addr(value)
         elsif not (attribute == :department and person[:major].length > 0)
-          # we don't want to show information that is certainly redundant.
+          # we don't want to show department if major is available too
           pretty_print printables[attribute], value
         end
       end
     end
-    puts "\n"
+    puts "\n" # newline separates records
     return true
   end
 end
