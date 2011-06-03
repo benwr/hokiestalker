@@ -9,13 +9,13 @@ Learn to play Beethoven in Five Hours!
 ## Installation ##
 1. `git clone https://benwr@github.com/benwr/hokiestalker.git`
 2. `chmod +x hokiestalker/hs.rb`
-3. `mv hokiestalker/hs.rb `<a directory in your $PATH>`/hs`
+3. `mv hokiestalker/hs.rb <a directory in your $PATH>/hs`
 4. `rm -rf hokiestalker`
 
 ## Usage ##
-VT PID Search: `hs benwr`
-VT Email Search: `hs benwr@vt.edu`
-Name Search (Careful; some searches with frequent hits will take a long time): `hs Ben Weinstein`
+* VT PID Search: `hs benwr`
+* VT Email Search: `hs benwr@vt.edu`
+* Name Search (Careful; some searches with frequent hits will take a long time): `hs Ben Weinstein`
 
 
 
