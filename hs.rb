@@ -12,7 +12,7 @@
 
 begin
   require 'net-ldap'
-rescue
+rescue LoadError
   require 'rubygems'
   require 'net-ldap'
 end
