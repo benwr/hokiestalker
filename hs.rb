@@ -30,27 +30,28 @@ end
 def search(filter)
   ldap = Net::LDAP.new :host => LDAP_URI
   treebase = "dc=vt, dc=edu"
+  printables = { # attributes for printing, and their associated labels
+                :cn =>                  'Name',
+                :uid =>                 'UID',
+                :uupid =>               'PID',
+                :mail =>                'Email',
+                :major =>               'Major',
+                :department =>          'Department',
+                :title =>               'Title',
+                :postaladdress =>       'VT Address',
+                :mailstop =>            'Mail Stop',
+                :telephonenumber =>     'VT Phone',
+                :localpostaladdress =>  'Home Address',
+                :localphone =>          'Personal Phone'
+  }
   if (result = ldap.search(:base => treebase, :filter => filter)).length > 0
     result.each do |person|
-      printables = { # attributes for printing, and their associated labels
-                    :cn =>                  'Name',
-                    :uid =>                 'UID',
-                    :uupid =>               'PID',
-                    :mail =>                'Email',
-                    :major =>               'Major',
-                    :department =>          'Department',
-                    :title =>               'Title',
-                    :postaladdress =>       'VT Address',
-                    :mailstop =>            'Mail Stop',
-                    :telephonenumber =>     'VT Phone',
-                    :localpostaladdress =>  'Home Address',
-                    :localphone =>          'Personal Phone'
-      }
-
-      person.each do |attribute, value|# value: an array containing attribute for person.
+      person.each do |attribute, value|#value: array containing person's attrbs.
         if printables.include? attribute
+
           if printables[attribute].include? "Address" # Extra step for addresses
             pretty_print printables[attribute], value[0].split("$")
+
           elsif not (attribute == :department and person[:major].length > 0)
             # we don't want to show information that is certainly redundant.
             pretty_print printables[attribute], value
