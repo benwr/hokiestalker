@@ -25,5 +25,9 @@ Released under the new BSD license.
 * VT Email Search: `hs benwr@vt.edu`
 * Name Search (Careful; some searches with frequent hits will take a long time): `hs Ben Weinstein`
 
+To override the PID search (for example, if you're looking for someone whose
+name is jones, but someone else has the PID 'jones'), use the `-n` flag: `hs -n
+jones`.
+
 
 
