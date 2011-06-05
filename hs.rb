@@ -27,56 +27,59 @@ def pretty_print(label, data)
   end
 end
 
+def parse_addr(addr)
+  return addr[0].split('$')
+end
+
 def search(filter)
   ldap = Net::LDAP.new :host => LDAP_URI
   treebase = "dc=vt, dc=edu"
-  result = ldap.search(:base => treebase, :filter => filter)
+  if (result = ldap.search(:base => treebase, :filter => filter)).length > 0
+    result.each do |person|
+      printables = { # attributes for printing, and their associated labels
+                    :cn =>                  'Name',
+                    :uid =>                 'UID',
+                    :uupid =>               'PID',
+                    :mail =>                'Email',
+                    :major =>               'Major',
+                    :department =>          'Department',
+                    :title =>               'Title',
+                    :postaladdress =>       'VT Address',
+                    :mailstop =>            'Mail Stop',
+                    :telephonenumber =>     'VT Phone',
+                    :localpostaladdress =>  'Home Address',
+                    :localphone =>          'Personal Phone'
+      }
 
-  return false if result.length <= 0
-
-  printables = { # attributes for printing, and their associated labels
-    :cn =>                  'Name',
-    :uid =>                 'UID',
-    :uupid =>               'PID',
-    :mail =>                'Email',
-    :major =>               'Major',
-    :department =>          'Department',
-    :title =>               'Title',
-    :postaladdress =>       'VT Address',
-    :mailstop =>            'Mail Stop',
-    :telephonenumber =>     'VT Phone',
-    :localpostaladdress =>  'Home Address',
-    :localphone =>          'Personal Phone'
-  }
-
-  result.each do |person|
-    person.each do |attribute, value| # value: array containing attr values.
-      if printables.include? attribute              # We want to print this attr
-
-        if printables[attribute].include? "Address" # Extra step for addresses
-          pretty_print printables[attribute], value[0].split('$')
-
-        elsif not (attribute == :department and person[:major].length > 0)
-          # we don't want to show department if major is available too
-          pretty_print printables[attribute], value
+      person.each do |attribute, value|# value: an array containing attribute for person.
+        if printables.include? attribute
+          if printables[attribute].include? "Address" # Extra step for addresses
+            pretty_print printables[attribute], parse_addr(value)
+          elsif not (attribute == :department and person[:major].length > 0)
+            # we don't want to show information that is certainly redundant.
+            pretty_print printables[attribute], value
+          end
         end
       end
+      puts "\n"
     end
-    puts "\n" # newline separates records
-    return true
+    return true # We found at least one person that fits the criteria
+  else
+    return false # We didn't find anyone
   end
 end
 
-querybits = ARGV[0..-1]
-query = querybits.join(" ")
+success = false
 
-# Initially try search by PID
-filter = Net::LDAP::Filter.eq("uupid",query)
-success = search(filter)
+# Initially try search by PID, unless -n flag specified
+if not ARGV.delete("-n")
+  filter = Net::LDAP::Filter.eq("uupid",query)
+  success = search(filter)
+end
 
 # Try partial search on full name (CN) if no pid hits
 if not success
-  filter = Net::LDAP::Filter.eq("cn","*" + querybits.join("*") + "*")
+  filter = Net::LDAP::Filter.eq("cn","*" + ARGV.join("*") + "*")
   success = search(filter)
 end
 
