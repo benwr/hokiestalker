@@ -70,7 +70,7 @@ success = false
 
 # Initially try search by PID, unless -n flag specified
 if not ARGV.delete("-n")
-  filter = Net::LDAP::Filter.eq("uupid",query)
+  filter = Net::LDAP::Filter.eq("uupid",ARGV[0])
   success = search(filter)
 end
 
@@ -82,7 +82,7 @@ end
 
 # Finally, check to see if it was an email address
 if not success
-  filter = Net::LDAP::Filter.eq("mail", query)
+  filter = Net::LDAP::Filter.eq("mail", ARGV[0])
   success = search(filter)
 end
 
