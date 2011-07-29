@@ -17,8 +17,7 @@ Released under the new BSD license.
 ## Installation ##
 1. `git clone git://github.com/benwr/hokiestalker.git`
 2. `chmod +x hokiestalker/hs.rb`
-3. `mv hokiestalker/hs.rb <a directory in your $PATH>/hs`
-4. `rm -rf hokiestalker`
+3. `ln -s hokiestalker/hs.rb <a directory in your $PATH>/hs`
 
 ## Usage ##
 * VT PID Search: `hs benwr`
