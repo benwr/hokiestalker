@@ -15,7 +15,7 @@ Released under the new BSD license.
 * net-ldap package, installable with `gem install net-ldap`
 
 ## Installation ##
-1. `git clone https://benwr@github.com/benwr/hokiestalker.git`
+1. `git clone git://github.com/benwr/hokiestalker.git`
 2. `chmod +x hokiestalker/hs.rb`
 3. `mv hokiestalker/hs.rb <a directory in your $PATH>/hs`
 4. `rm -rf hokiestalker`
